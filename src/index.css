@@ -1,0 +1,131 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Responsive Typography */
+@media (max-width: 600px) {
+  h1 { font-size: 1.5rem !important; }
+  h2 { font-size: 1.25rem !important; }
+  h3 { font-size: 1.125rem !important; }
+  h4 { font-size: 1rem !important; }
+  h5 { font-size: 0.875rem !important; }
+  h6 { font-size: 0.75rem !important; }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Responsive tables */
+.MuiTable-root {
+  min-width: 600px;
+}
+
+@media (max-width: 600px) {
+  .MuiTable-root {
+    min-width: 100%;
+  }
+}
+
+/* Button sizes for mobile */
+@media (max-width: 600px) {
+  .MuiButton-root {
+    min-height: 36px;
+    font-size: 0.875rem;
+  }
+}
+
+/* Input sizes for mobile */
+@media (max-width: 600px) {
+  .MuiTextField-root {
+    font-size: 0.875rem;
+  }
+  
+  .MuiInputLabel-root {
+    font-size: 0.875rem;
+  }
+}
+
+/* Card responsive */
+@media (max-width: 600px) {
+  .MuiCardContent-root {
+    padding: 12px !important;
+  }
+}
+
+/* Grid responsive spacing */
+@media (max-width: 600px) {
+  .MuiGrid-container {
+    margin: -8px !important;
+  }
+  
+  .MuiGrid-item {
+    padding: 8px !important;
+  }
+}
+
+/* Paper responsive padding */
+@media (max-width: 600px) {
+  .MuiPaper-root {
+    padding: 16px !important;
+  }
+}
+
+/* Hide elements on mobile */
+@media (max-width: 600px) {
+  .hide-on-mobile {
+    display: none !important;
+  }
+}
+
+/* Show elements only on mobile */
+@media (min-width: 601px) {
+  .show-on-mobile {
+    display: none !important;
+  }
+}
