@@ -1,0 +1,69 @@
+/* Responsive Table */
+@media (max-width: 768px) {
+  .responsive-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .mobile-hidden {
+    display: none;
+  }
+}
+
+/* Responsive Cards */
+.responsive-card {
+  margin-bottom: 16px;
+}
+
+@media (max-width: 600px) {
+  .responsive-card {
+    margin-bottom: 12px;
+  }
+}
+
+/* Responsive Grid */
+.responsive-grid {
+  display: grid;
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .responsive-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .responsive-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1025px) {
+  .responsive-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+/* styles.css */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
