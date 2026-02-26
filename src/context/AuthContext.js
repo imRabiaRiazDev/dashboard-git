@@ -1,8 +1,8 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
-// Base URL se trailing slash hatao
-const baseURL = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace(/\/+$/, '');
+// Base URL - TRAILING SLASH HATAO, /api MAT JODO
+const baseURL = (process.env.REACT_APP_API_URL || 'http://localhost:5000').replace(/\/+$/, '');
 const API_URL = baseURL;
 
 const AuthContext = createContext({});
@@ -30,17 +30,15 @@ export const AuthProvider = ({ children }) => {
           const userData = JSON.parse(storedUser);
           setUser(userData);
           
-          // Also fetch fresh user data from API to ensure Meta credentials are up to date
           try {
-            // ✅ FIXED: Added /api prefix
-            const response = await fetch(`${API_URL}/api/auth/me`.replace(/\/+/g, '/'), {
+            // SIMPLE - no replace
+            const response = await fetch(`${API_URL}/api/auth/me`, {
               headers: {
                 'Authorization': `Bearer ${token}`,
               },
             });
             const data = await response.json();
             if (data.success && data.user) {
-              // Update stored user with fresh data
               const updatedUser = {
                 ...userData,
                 ...data.user,
@@ -62,11 +60,10 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   };
 
-  // Login function
   const login = async (email, password) => {
     try {
-      // ✅ FIXED: Added /api prefix
-      const response = await fetch(`${API_URL}/api/auth/login`.replace(/\/+/g, '/'), {
+      // SIMPLE - no replace
+      const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -97,11 +94,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Register function
   const register = async (userData) => {
     try {
-      // ✅ FIXED: Added /api prefix
-      const response = await fetch(`${API_URL}/api/auth/register`.replace(/\/+/g, '/'), {
+      // SIMPLE - no replace
+      const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -132,7 +128,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Logout function
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -140,12 +135,10 @@ export const AuthProvider = ({ children }) => {
     window.location.href = '/login';
   };
 
-  // Update Meta credentials function
   const updateMetaCredentials = async (data) => {
     try {
       const token = localStorage.getItem('token');
-      // ✅ FIXED: Added /api prefix
-      const response = await fetch(`${API_URL}/api/auth/meta-credentials`.replace(/\/+/g, '/'), {
+      const response = await fetch(`${API_URL}/api/auth/meta-credentials`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -157,7 +150,6 @@ export const AuthProvider = ({ children }) => {
       const result = await response.json();
 
       if (response.ok && result.success) {
-        // Update user in localStorage and state
         const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
         const updatedUser = {
           ...currentUser,
@@ -187,20 +179,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Get current user info
-  const getCurrentUser = () => {
-    return user;
-  };
+  const getCurrentUser = () => user;
 
-  // Check if user is admin
-  const isAdmin = () => {
-    return user?.role === 'admin';
-  };
+  const isAdmin = () => user?.role === 'admin';
 
-  // Check if Meta is connected
-  const isMetaConnected = () => {
-    return !!(user?.metaAccessToken && user?.metaAdAccountId);
-  };
+  const isMetaConnected = () => !!(user?.metaAccessToken && user?.metaAdAccountId);
 
   const value = {
     user,
