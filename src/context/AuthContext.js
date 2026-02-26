@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
-// CHANGE 1: Base URL se trailing slash hatao
+// Base URL se trailing slash hatao
 const baseURL = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace(/\/+$/, '');
 const API_URL = baseURL;
 
@@ -32,7 +32,8 @@ export const AuthProvider = ({ children }) => {
           
           // Also fetch fresh user data from API to ensure Meta credentials are up to date
           try {
-            const response = await fetch(`${API_URL}/auth/me`.replace(/\/+/g, '/'), {
+            // ✅ FIXED: Added /api prefix
+            const response = await fetch(`${API_URL}/api/auth/me`.replace(/\/+/g, '/'), {
               headers: {
                 'Authorization': `Bearer ${token}`,
               },
@@ -64,8 +65,8 @@ export const AuthProvider = ({ children }) => {
   // Login function
   const login = async (email, password) => {
     try {
-      // CHANGE 2: Double slash fix
-      const response = await fetch(`${API_URL}/auth/login`.replace(/\/+/g, '/'), {
+      // ✅ FIXED: Added /api prefix
+      const response = await fetch(`${API_URL}/api/auth/login`.replace(/\/+/g, '/'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -99,8 +100,8 @@ export const AuthProvider = ({ children }) => {
   // Register function
   const register = async (userData) => {
     try {
-      // CHANGE 2: Double slash fix
-      const response = await fetch(`${API_URL}/auth/register`.replace(/\/+/g, '/'), {
+      // ✅ FIXED: Added /api prefix
+      const response = await fetch(`${API_URL}/api/auth/register`.replace(/\/+/g, '/'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -143,7 +144,8 @@ export const AuthProvider = ({ children }) => {
   const updateMetaCredentials = async (data) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/auth/meta-credentials`.replace(/\/+/g, '/'), {
+      // ✅ FIXED: Added /api prefix
+      const response = await fetch(`${API_URL}/api/auth/meta-credentials`.replace(/\/+/g, '/'), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
