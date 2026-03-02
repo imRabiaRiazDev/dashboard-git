@@ -44,6 +44,7 @@ const Register = () => {
     e.preventDefault();
     setError('');
     
+    // Validation
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return;
@@ -64,11 +65,15 @@ const Register = () => {
       companyName: formData.companyName
     };
     
+    console.log('📤 Attempting registration for:', formData.email);
+    
     const result = await register(userData);
     
     if (result.success) {
+      console.log('✅ Registration successful, redirecting...');
       navigate('/dashboard');
     } else {
+      console.error('❌ Registration failed:', result.error);
       setError(result.error);
     }
     

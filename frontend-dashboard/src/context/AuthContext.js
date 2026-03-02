@@ -1,9 +1,14 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
-// FIX 1: Base URL - BILKUL YEH COPY KARO
-const baseURL = (process.env.REACT_APP_API_URL || 'http://localhost:5000').replace(/\/+$/, '');
-const API_URL = baseURL;
+// =============== FIXED API URL ===============
+// Development ke liye localhost, production ke liye environment variable
+const API_URL = process.env.NODE_ENV === 'development' 
+  ? 'http://localhost:5000' 
+  : (process.env.REACT_APP_API_URL || 'https://your-backend-name.railway.app');
+
+console.log('🚀 API URL:', API_URL);
+console.log('📱 Environment:', process.env.NODE_ENV);
 
 const AuthContext = createContext({});
 
@@ -25,46 +30,64 @@ export const AuthProvider = ({ children }) => {
       try {
         const decoded = jwtDecode(token);
         if (decoded.exp * 1000 < Date.now()) {
+          console.log('⏰ Token expired');
           logout();
         } else {
           const userData = JSON.parse(storedUser);
           setUser(userData);
           
           try {
-            // FIX 2: Simple fetch - NO .replace()
+            console.log('🔍 Verifying auth with server...');
             const response = await fetch(`${API_URL}/api/auth/me`, {
               headers: {
                 'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
               },
             });
-            const data = await response.json();
-            if (data.success && data.user) {
-              const updatedUser = {
-                ...userData,
-                ...data.user,
-                metaAccessToken: userData.metaAccessToken || data.user.metaAccessToken,
-                metaAdAccountId: userData.metaAdAccountId || data.user.metaAdAccountId
-              };
-              localStorage.setItem('user', JSON.stringify(updatedUser));
-              setUser(updatedUser);
+            
+            const text = await response.text();
+            console.log('📡 Auth response:', text.substring(0, 150));
+            
+            // Check if response is HTML (404 page)
+            if (text.startsWith('<!DOCTYPE')) {
+              console.warn('⚠️ Server returned HTML - API route not found');
+              return;
+            }
+            
+            try {
+              const data = JSON.parse(text);
+              if (data.success && data.user) {
+                const updatedUser = {
+                  ...userData,
+                  ...data.user,
+                  metaAccessToken: userData.metaAccessToken || data.user.metaAccessToken,
+                  metaAdAccountId: userData.metaAdAccountId || data.user.metaAdAccountId
+                };
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+                setUser(updatedUser);
+                console.log('✅ User data updated from server');
+              }
+            } catch (parseError) {
+              console.error('❌ Failed to parse JSON response:', parseError);
             }
           } catch (error) {
-            console.error('Error fetching user data:', error);
+            console.error('❌ Error fetching user data:', error);
           }
         }
       } catch (error) {
-        console.error('Token decode error:', error);
+        console.error('❌ Token decode error:', error);
         logout();
       }
     }
     setLoading(false);
   };
 
-  // Login function - FIXED
   const login = async (email, password) => {
     try {
-      // FIX 3: NO .replace() - BILKUL YEH COPY KARO
-      const response = await fetch(`${API_URL}/api/auth/login`, {
+      const loginUrl = `${API_URL}/api/auth/login`;
+      console.log('📤 Login request to:', loginUrl);
+      
+      const response = await fetch(loginUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,34 +95,59 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      console.log('📥 Login raw response:', text.substring(0, 200));
+      
+      // Check if response is HTML
+      if (text.startsWith('<!DOCTYPE')) {
+        console.error('❌ Server returned HTML - API URL might be wrong:', API_URL);
+        return {
+          success: false,
+          error: 'Server se HTML mil raha hai. API URL check karein: ' + API_URL
+        };
+      }
+
+      // Try to parse JSON
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (parseError) {
+        console.error('❌ JSON parse error:', parseError);
+        return {
+          success: false,
+          error: 'Server se invalid response. Response: ' + text.substring(0, 100)
+        };
+      }
 
       if (response.ok && data.success) {
         const { user, token } = data;
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
         setUser(user);
+        console.log('✅ Login successful for:', user.email);
         return { success: true };
       } else {
+        console.error('❌ Login failed:', data.error);
         return {
           success: false,
           error: data.error || 'Login failed',
         };
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('❌ Login error:', error);
       return {
         success: false,
-        error: 'Network error. Please try again.',
+        error: 'Network error. API URL check karein: ' + API_URL,
       };
     }
   };
 
-  // Register function - FIXED
   const register = async (userData) => {
     try {
-      // FIX 4: NO .replace() - BILKUL YEH COPY KARO
-      const response = await fetch(`${API_URL}/api/auth/register`, {
+      const registerUrl = `${API_URL}/api/auth/register`;
+      console.log('📤 Register request to:', registerUrl);
+      
+      const response = await fetch(registerUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -107,13 +155,32 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify(userData),
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      console.log('📥 Register raw response:', text.substring(0, 200));
+      
+      if (text.startsWith('<!DOCTYPE')) {
+        return {
+          success: false,
+          error: 'Server se HTML mil raha hai. API URL check karein!'
+        };
+      }
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (parseError) {
+        return {
+          success: false,
+          error: 'Server se invalid response'
+        };
+      }
 
       if (response.ok && data.success) {
         const { user, token } = data;
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
         setUser(user);
+        console.log('✅ Registration successful for:', user.email);
         return { success: true };
       } else {
         return {
@@ -122,7 +189,7 @@ export const AuthProvider = ({ children }) => {
         };
       }
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('❌ Registration error:', error);
       return {
         success: false,
         error: 'Network error. Please try again.',
@@ -134,6 +201,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
+    console.log('👋 User logged out');
     window.location.href = '/login';
   };
 
@@ -160,6 +228,7 @@ export const AuthProvider = ({ children }) => {
         };
         localStorage.setItem('user', JSON.stringify(updatedUser));
         setUser(updatedUser);
+        console.log('✅ Meta credentials updated');
         
         return { 
           success: true, 
@@ -173,7 +242,7 @@ export const AuthProvider = ({ children }) => {
         };
       }
     } catch (error) {
-      console.error('Update meta credentials error:', error);
+      console.error('❌ Update meta credentials error:', error);
       return {
         success: false,
         error: 'Network error. Please try again.',

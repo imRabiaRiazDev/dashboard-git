@@ -30,11 +30,15 @@ const Login = () => {
     setError('');
     setLoading(true);
 
+    console.log('🔐 Attempting login for:', email);
+    
     const result = await login(email, password);
     
     if (result.success) {
+      console.log('✅ Login successful, redirecting...');
       navigate('/dashboard');
     } else {
+      console.error('❌ Login failed:', result.error);
       setError(result.error);
     }
     
